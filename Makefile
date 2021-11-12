@@ -1,59 +1,45 @@
-NAME			=	fractol
+CC		= 	gcc
+NAME	= 	fractol
+SRCS	= 	srcs/fractol.c		\
+			srcs/hooks.c		\
+			srcs/julia.c		\
+			srcs/mandelbrot.c	\
+			srcs/utils.c		\
+			 srcs/steps.c		\
 
-SRCS_DIR		=	./srcs/
+OBJS		= $(SRCS:.c=.o)
 
-OBJS_DIR		=	./objs/
+FLAGS	= -Wall -Wextra -Werror
+LIBC	= ar rc
+LIBR	= ranlib
+RM		= rm -f
+INCL	= ./
 
-HEADERS_DIR		=	./headers/
+LIBFT	= libft/libft.a
 
-LIBFT_DIR		=	./libft/
+all:	$(NAME)
 
-SRCS			=	$(SRCS_DIR) fractol.c \
 
-HEADERS			=	$(wildcard $(HEADERS_DIR)*.h)
+$(NAME): 	$(OBJS)
+	make bonus -C libft
+	make -C libmlx
+	$(CC) $(FLAGS) $(LIBFT) libmlx/libmlx.a -framework OpenGL -framework AppKit $(OBJS) -o $(NAME)
 
-OBJS			=	$(addprefix $(OBJS_DIR), $(notdir $(SRCS:.c=.o)))
 
-CC				=	gcc
+.c.o:
+	$(CC) $(FLAGS) -I includes -c $< -o $(<:.c=.o)
 
-CFLAGS			=	-Wall -Wextra -Werror
-
-LDFLAGS			=	-L$(LIBMLX_DIR) -lmlx -L$(LIBFT_DIR) -framework OpenGL -framework Appkit -O3
-
-RM				=	rm -f
-
-LIBFT			=	$(addprefix $(LIBFT_DIR), libft.a)
-
-LIBMLX			=	$(addprefix $(LIBMLX_DIR), libmlx.a)
-
-LIBFT_DIR		=	./libft/
-
-LIBMLX_DIR		=	./minilibx_opengl_20191021/
-
-all:	$(LIBFT) $(LIBMLX) $(NAME)
-$(OBJS_DIR)%.o:	$(SRCS_DIR)%.c $(HEADERS) $(LIBFT) $(LIBMLX_DIR)/libmlx.a | $(OBJS_DIR)
-	$(CC) $(CFLAGS) -O3 -I$(HEADERS_DIR) -Imlx -c $< -o $@
-
-$(LIBFT):
-	make -C $(LIBFT_DIR)
-
-$(LIBMLX):
-	make -C $(LIBMLX_DIR)
-
-$(NAME): $(OBJS) $(LIBFT) $(LIBMLX_DIR)/libmlx.a
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
-# gcc -o $(NAME) $(OBJS) $(LIBMLX_DIR)/libmlx.a
 
 clean:
-		$(RM) -r $(OBJS_DIR)
-		make clean -C $(LIBFT_DIR) fclean
+		$(RM) $(OBJS)
+		make clean -C libft
+#		make clean -C libmlx
 
-fclean: clean
+fclean:	clean
 		$(RM) $(NAME)
+		make fclean -C libft
+#make fclean -C libmlx
 
-$(OBJS_DIR):
-	mkdir $(OBJS_DIR)
+re:		fclean all
 
-re:	fclean $(OBJS_DIR) all
-
-.PHONY:	all clean fclean re
+.PHONY:	fclean clean re bonus
