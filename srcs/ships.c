@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   julia.c                                            :+:      :+:    :+:   */
+/*   ships.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bferny <bferny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/26 18:04:27 by bferny            #+#    #+#             */
-/*   Updated: 2021/11/16 23:05:58 by bferny           ###   ########.fr       */
+/*   Created: 2021/11/16 20:41:04 by bferny            #+#    #+#             */
+/*   Updated: 2021/11/16 23:05:29 by bferny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../headers/fractol.h"
 
-int	julia(int i, t_fractal *fr)
+int	ships(int i, t_fractal *fr)
 {
 	double		Z_re;
 	double		Z_im;
@@ -24,17 +24,17 @@ int	julia(int i, t_fractal *fr)
 	Z_im = fr->C_im;
 	re2 = ft_power(Z_re, 2.0);
 	im2 = ft_power(Z_im, 2.0);
-	color = 0xfbf9f0;
+	color = 0xba9fef;
 	while (ft_power(Z_re, 2.0) + ft_power(Z_im, 2.0) <= 4 && i < fr->max_iter)
 	{
-		color += 0xfff8f5;
-		Z_im = 2 * Z_re * Z_im + fr->julia_im;
-		Z_re = re2 - im2 + fr->julia_re;
+		color += 0xf0f0ff;
+		Z_im = 2 * fabs(Z_re * Z_im) + fr->C_im;
+		Z_re = re2 - im2 + fr->C_re;
 		re2 = ft_power(Z_re, 2.0);
 		im2 = ft_power(Z_im, 2.0);
 		i++;
 	}
 	if (i == fr->max_iter)
-		color = 0xff7f7f;
+		color = 0x7986e3;
 	return (color);
 }

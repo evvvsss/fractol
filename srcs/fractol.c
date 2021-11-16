@@ -6,99 +6,64 @@
 /*   By: bferny <bferny@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/20 21:32:00 by bferny            #+#    #+#             */
-/*   Updated: 2021/11/12 20:34:23 by bferny           ###   ########.fr       */
+/*   Updated: 2021/11/16 23:09:34 by bferny           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../headers/fractol.h"
 
-
-// что-то не прекращает работу цикла мандельброта
-
 void	my_mlx_pixel_put(t_data *vars, int x, int y, int color)
 {
 	char	*dst;
 
-	//vars->color = color;
-	printf("%d%s", color, " cvet my_mlx_pixel_put\n");
-	dst = vars->addr + (y * vars->line_length
-			+ x * (vars->bits_per_pixel / 8));
+	dst = vars->addr + (y * vars->line_length + x * (vars->bits_per_pixel / 8));
 	*(unsigned int *)dst = color;
-	printf("%s", "в функции my_mlx_pixel_put\n");
 }
 
-int	choose_name(t_fractal *fr, int argc, char **argv)
+void	hooks(t_win *win)
 {
-	printf("%s", "в функции choose name\n");
+	mlx_hook(win->win, KEY_PRESS, MASK_KEY_PRESS, my_keys, win);
+	mlx_hook(win->win, KEY_ESC, MASK_DESTROY, my_close, win);
+	mlx_hook(win->win, WHEEL, MASK_WHEEL, my_zoom, win);
+	if (win->fr->name == 2)
+		mlx_hook(win->win, MOTION_NOTIFY, MASK_POINTER_MOTION, my_motion, win);
+}
+
+int	fractal_value(t_fractal *fr)
+{
+	if (fr->name == 1)
+		return (mandelbrot(0, fr));
+	else if (fr->name == 2)
+		return (julia(0, fr));
+	else if (fr->name == 3)
+		return (ships(0, fr));
+	else
+		return (0);
+}
+
+int	choose_name(t_win *win, int argc, char **argv)
+{
 	if (ft_strncmp(argv[1], "mandelbrot\0", 11) == 0)
 		return (1);
 	if (ft_strncmp(argv[1], "julia\0", 6) == 0)
 	{	
 		if (argc == 2)
 		{
-			fr->julia_re = 0.5;
-			fr->julia_im = -0.5;
+			win->fr->julia_re = -0.8;
+			win->fr->julia_im = 0.4;
 		}
 		else if (argc == 4)
 		{
-			fr->julia_re = ft_atof(argv[2]);
-			fr->julia_im = ft_atof(argv[3]);
+			win->fr->julia_re = ft_atof(argv[2]);
+			win->fr->julia_im = ft_atof(argv[3]);
 		}
 		else
 			ft_error(-1);
 		return (2);
 	}
+	if (ft_strncmp(argv[1], "ships\0", 6) == 0)
+		return (3);
 	else
-	{
-		write(2, "wrong fractal name\n", 19);
-		exit (0);
-		return (0);
-	}
-}
-
-t_data	*draw_pixels(t_data *vars)
-{
-	vars->img = mlx_new_image(vars->mlx, 1920, 1080);
-	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel,
-			&vars->line_length, &vars->endian);
-	if (vars->addr == NULL)
-		return (NULL);
-	return (vars);
-}
-
-t_data	*draw_window(int argc, char **argv)
-{
-	t_data		*vars;
-	t_fractal	*fr;
-
-	vars = (t_data *)malloc(sizeof(t_data));
-	if (vars == NULL)
-		return (NULL);
-	vars->mlx = mlx_init();
-	if (vars->mlx == NULL)
-		return (NULL);
-	vars->win = mlx_new_window(vars->mlx, 1920, 1080, "Fractoool!");
-	if (vars->win == NULL)
-		return (NULL);
-	vars = draw_pixels(vars);
-	if (vars == NULL)
-		return (NULL);
-	printf("%s", "в функции draw_window\n");
-	fr = first_step(argc, argv);
-	hooks(vars);
-	second_step(vars, fr);
-	mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
-	return (vars);
-}
-
-int	main(int argc, char **argv)
-{
-	t_data	*vars;
-
-	// if (argc < 2)
-	// 	return (1);
-	vars = draw_window(argc, argv);
-	printf("%s", "в функции main\n");
-	mlx_loop(vars->mlx);
+		ft_error(-1);
 	return (0);
 }

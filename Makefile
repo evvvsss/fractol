@@ -5,7 +5,11 @@ SRCS	= 	srcs/fractol.c		\
 			srcs/julia.c		\
 			srcs/mandelbrot.c	\
 			srcs/utils.c		\
-			 srcs/steps.c		\
+			srcs/init_fractal.c	\
+			srcs/navigation.c	\
+			srcs/main.c			\
+			srcs/ships.c		\
+			srcs/draw.c			\
 
 OBJS		= $(SRCS:.c=.o)
 
@@ -27,7 +31,7 @@ $(NAME): 	$(OBJS)
 
 
 .c.o:
-	$(CC) $(FLAGS) -I includes -c $< -o $(<:.c=.o)
+	$(CC) $(FLAGS) -I includes -c $< -o $(<:.c=.o) -Ofast
 
 
 clean:
